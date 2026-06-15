@@ -12,9 +12,6 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 RUN pip install -U yt-dlp
 
-# Tell yt-dlp where node is
-RUN mkdir -p /root/.config/yt-dlp && \
-    printf -- '--js-runtimes\nnode:/usr/bin/node\n' > /root/.config/yt-dlp/config
 
 COPY . .
 
