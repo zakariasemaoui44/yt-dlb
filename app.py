@@ -27,7 +27,7 @@ def youtube_test():
             "yt-dlp",
             "--dump-json",
             "--no-download",
-            "https://www.youtube.com/watch?v=5PgVkZRgAHo"
+            "https://www.youtube.com/watch?v=jNQXAC9IVRw"
         ],
         capture_output=True,
         text=True
