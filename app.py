@@ -28,10 +28,14 @@ def get_yt_dlp_cmd(url: str, extra_args: list = []):
     cmd += extra_args
     cmd.append(url)
     return cmd
-
+    
 @app.get("/youtube-test")
 def youtube_test(url: str):
-    extra_args = ["--dump-json", "--no-download"]
+    extra_args = [
+        "--dump-json", 
+        "--no-download",
+        "--extractor-args", "youtube:skip=js"  # Skip JS extraction
+    ]
     cmd = get_yt_dlp_cmd(url, extra_args)
     result = subprocess.run(cmd, capture_output=True, text=True)
     return {
