@@ -41,3 +41,16 @@ def youtube_test():
         "stdout": result.stdout[:1000],
         "stderr": result.stderr[:1000]
     }
+@app.get("/node-test")
+def node_test():
+    result = subprocess.run(
+        ["node", "--version"],
+        capture_output=True,
+        text=True
+    )
+
+    return {
+        "return_code": result.returncode,
+        "stdout": result.stdout,
+        "stderr": result.stderr
+    }
