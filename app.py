@@ -22,8 +22,8 @@ def test():
 def get_yt_dlp_cmd(url: str, extra_args: list = []):
     cmd = ["yt-dlp", "--no-playlist", "--js-runtimes", "node:/usr/bin/node"]
 
-    if os.path.exists(COOKIES_PATH):
-        cmd += ["--cookies", COOKIES_PATH]
+   # if os.path.exists(COOKIES_PATH):
+    #    cmd += ["--cookies", COOKIES_PATH]
 
     cmd += extra_args
     cmd.append(url)
