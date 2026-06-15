@@ -20,7 +20,7 @@ def test():
     return {"yt_dlp_version": result.stdout.strip()}
 
 def get_yt_dlp_cmd(url: str, extra_args: list = []):
-    cmd = ["yt-dlp", "--no-playlist", "--js-runtimes", "node"]
+    cmd = ["yt-dlp", "--no-playlist"]
 
     if os.path.exists(COOKIES_PATH):
         cmd += ["--cookies", COOKIES_PATH]
