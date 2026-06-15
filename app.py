@@ -5,7 +5,7 @@ import json
 
 app = FastAPI()
 
-COOKIES_PATH = os.path.join(os.path.dirname(__file__), "cookies.txt")
+COOKIES_PATH = os.path.join(os.path.dirname(__file__), "www.youtube.com_cookies.txt")
 
 @app.get("/")
 def home():
@@ -29,21 +29,22 @@ def get_yt_dlp_cmd(url: str, extra_args: list = None):
         "--no-playlist"
     ]
     
-    # Use Deno for JavaScript runtime (better for latest yt-dlp)
+    # Use Deno for JavaScript runtime
     cmd += ["--js-runtimes", "deno"]
     
-    # Add remote components for EJS (required for latest yt-dlp)
+    # Add remote components for EJS
     cmd += ["--remote-components", "ejs:npm"]
+    
+    # Add cookies if they exist
+    if os.path.exists(COOKIES_PATH) and os.path.getsize(COOKIES_PATH) > 100:
+        cmd += ["--cookies", COOKIES_PATH]
     
     cmd += [
         "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "--sleep-interval", "2",
-        "--max-sleep-interval", "5"
+        "--max-sleep-interval", "5",
+        "--no-check-certificates"
     ]
-
-    # Only add cookies if the file exists and is valid
-    if os.path.exists(COOKIES_PATH) and os.path.getsize(COOKIES_PATH) > 1000:
-        cmd += ["--cookies", COOKIES_PATH]
 
     cmd += extra_args
     cmd.append(url)
@@ -54,8 +55,8 @@ def youtube_test(url: str):
     extra_args = [
         "--dump-json", 
         "--no-download",
-        "--extractor-args", "youtube:player_client=android",
-        "--no-check-certificates"
+        "--extractor-args", "youtube:player_client=web",
+        "--extractor-args", "youtube:po_token=web"
     ]
     cmd = get_yt_dlp_cmd(url, extra_args)
     
@@ -96,11 +97,13 @@ def youtube_test(url: str):
 
 @app.get("/youtube-test-simple")
 def youtube_test_simple(url: str):
-    """Simplest possible test"""
+    """Simplest possible test with cookies"""
     cmd = [
         "yt-dlp",
         "--dump-json",
         "--no-download",
+        "--cookies", COOKIES_PATH,
+        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         url
     ]
     try:
@@ -117,6 +120,7 @@ def youtube_test_simple(url: str):
         return {
             "success": result.returncode == 0,
             "video_title": video_info.get('title') if video_info else None,
+            "video_id": video_info.get('id') if video_info else None,
             "error": result.stderr[:500] if result.stderr else None
         }
     except Exception as e:
@@ -165,7 +169,7 @@ def ytdlp_version():
 
 @app.get("/env-check")
 def env_check():
-    """Check if required executables are available"""
+    """Check if required executables and cookies are available"""
     executables = ["yt-dlp", "ffmpeg", "node", "deno"]
     results = {}
     
@@ -183,7 +187,8 @@ def env_check():
     # Check cookies
     results["cookies"] = {
         "exists": os.path.exists(COOKIES_PATH),
-        "size": os.path.getsize(COOKIES_PATH) if os.path.exists(COOKIES_PATH) else 0
+        "size": os.path.getsize(COOKIES_PATH) if os.path.exists(COOKIES_PATH) else 0,
+        "path": COOKIES_PATH
     }
     
     return results
