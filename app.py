@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 import subprocess
 import os
-import tempfile
 
 app = FastAPI()
+
+COOKIES_PATH = os.path.join(os.path.dirname(__file__), "cookies.txt")
 
 @app.get("/")
 def home():
@@ -19,21 +20,11 @@ def test():
     return {"yt_dlp_version": result.stdout.strip()}
 
 def get_yt_dlp_cmd(url: str, extra_args: list = []):
-    cmd = [
-        "yt-dlp",
-        "--no-playlist",
-        "--js-runtimes", "nodejs",   # explicitly tell yt-dlp to use node
-    ]
+    cmd = ["yt-dlp", "--no-playlist", "--js-runtimes", "nodejs"]
 
-    # Use cookies file if available (set via Render env variable)
-    cookies_content = os.environ.get("YT_COOKIES")
-    if cookies_content:
-        # Write cookies to a temp file
-        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
-        tmp.write(cookies_content)
-        tmp.close()
-        cmd += ["--cookies", tmp.name]
-    
+    if os.path.exists(COOKIES_PATH):
+        cmd += ["--cookies", COOKIES_PATH]
+
     cmd += extra_args
     cmd.append(url)
     return cmd
