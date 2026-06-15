@@ -33,7 +33,14 @@ def get_yt_dlp_cmd(url: str, extra_args: list = []):
 def youtube_test():
     cmd = get_yt_dlp_cmd(
         "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-        ["--dump-json", "--no-download"]
+        [
+    "yt-dlp",
+    "--js-runtimes",
+    "node:/usr/bin/node",
+    "--dump-json",
+    "--no-download",
+    url
+]
     )
     result = subprocess.run(cmd, capture_output=True, text=True)
     return {
@@ -54,3 +61,17 @@ def node_test():
         "stdout": result.stdout,
         "stderr": result.stderr
     }
+@app.get("/ytdlp-version")
+def ytdlp_version():
+    import subprocess
+
+    result = subprocess.run(
+        ["yt-dlp", "--version"],
+        capture_output=True,
+        text=True
+    )
+
+    return {
+        "stdout": result.stdout,
+        "stderr": result.stderr
+    }    
