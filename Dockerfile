@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Install system dependencies including Node.js and Deno
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     curl \
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Deno (recommended for yt-dlp EJS)
+# Install Deno
 RUN curl -fsSL https://deno.land/install.sh | sh
 ENV PATH="/root/.deno/bin:$PATH"
 
@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir --upgrade yt-dlp
 
-# Copy application code
+# Copy application code (including cookies file)
 COPY . .
 
 # Expose the port
